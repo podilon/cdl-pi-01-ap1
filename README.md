@@ -13,19 +13,19 @@ Turno: Noite
 
 ### Informações:
 
-> 1 – Esta atividade corresponderá a nota de AP1 da disciplina de Projeto Integrado I, do curso de ADS, noite;
+1 – Esta atividade corresponderá a nota de AP1 da disciplina de Projeto Integrado I, do curso de ADS, noite;
 
->2 – Deverá ser realizada em equipe composta de 2 a 5 alunos. OUTROS TIPOS DE COMPOSIÇÕES NÃO SERÃO ACEITAS;
+2 – Deverá ser realizada em equipe composta de 2 a 5 alunos. OUTROS TIPOS DE COMPOSIÇÕES NÃO SERÃO ACEITAS;
 
->3 – O trabalho deverá ser entregue exclusivamente via Teams até a data de realização da AP1, contando o nome dos integrantes das equipes;
+3 – O trabalho deverá ser entregue exclusivamente via Teams até a data de realização da AP1, contando o nome dos integrantes das equipes;
 
->4 – Não serão aceitos trabalhos copiados, incluindo códigos;
+4 – Não serão aceitos trabalhos copiados, incluindo códigos;
 
->5 – A desobediênciaaos itens 2, 3 ou 4 implicará na atribuição da nota ZERO;
+5 – A desobediênciaaos itens 2, 3 ou 4 implicará na atribuição da nota ZERO;
 
->6 – A montagem das equipesé livre e é de responsabilidade de cada aluno aformação/ingresso nas equipes;
+6 – A montagem das equipesé livre e é de responsabilidade de cada aluno aformação/ingresso nas equipes;
 
->7 – São dadas duas opções de atividades,cabendo a cada equipe a escolha de apenas uma delas;
+7 – São dadas duas opções de atividades,cabendo a cada equipe a escolha de apenas uma delas;
 
 
 ------------
