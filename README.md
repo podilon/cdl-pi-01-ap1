@@ -36,13 +36,16 @@ Turno: Noite
 
 Opção 1 – Construção de um aplicativo usando linguagem Visualg ou C para atender a estes requisitos:
 
+a)  O aplicativo deverá possuir um cadastro de computadores, armazenando as seguintes informações: nome da máquina, IP, SO instalado(Linux, Windows, Solaris, MacOS, etc),versão do SO, usuário responsável pela máquina e osetor/departamento onde o computador está instalado.
 
-    O aplicativo deverá possuir um cadastro de computadores, armazenando as seguintes informações: nome da máquina, IP, SO instalado(Linux, Windows, Solaris, MacOS, etc),versão do SO, usuário responsável pela máquina e osetor/departamento onde o computador está instalado.
-	O armazenamento dos dados deverá ser realizado através de arquivo texto, utilizando como separador o delimitador ponto e vírgula(;).
-	c)O aplicativo deverá dar ao usuário a possibilidade de alterar ou excluir um cadastro de computador já armazenado, sendo utilizado o IP para realizar a busca de um registro que deva ser excluídoou alterado, e todas estas operações devem ser persistidas no arquivo texto indicado no item ‘2’.
-	Deverá ser possível ao usuário gerar um arquivo de backup dos dados gravados no arquivo texto com a extensão‘.bkp’.
-	O aplicativo deverá mostrar todas as opções em um menu, incluindo a opção de sair do aplicativo.
-	
+b) O armazenamento dos dados deverá ser realizado através de arquivo texto, utilizando como separador o delimitador ponto e vírgula(;).
+
+c) O aplicativo deverá dar ao usuário a possibilidade de alterar ou excluir um cadastro de computador já armazenado, sendo utilizado o IP para realizar a busca de um registro que deva ser excluídoou alterado, e todas estas operações devem ser persistidas no arquivo texto indicado no item ‘b’.
+
+d) Deverá ser possível ao usuário gerar um arquivo de backup dos dados gravados no arquivo texto com a extensão‘.bkp’.
+
+e) O aplicativo deverá mostrar todas as opções em um menu, incluindo a opção de sair do aplicativo.
+
 
 
 
