@@ -286,7 +286,7 @@ void menu()
     printf("*** DIGITE 03 - VISUALIZAR LISTA DE COMPUTADORES ************\n");
     printf("*** DIGITE 04 - ALTERAR CADASTRO DE COMPUTADOR **************\n");
     printf("*** DIGITE 05 - EXCLUIR CADASTRO DE COMPUTADOR **************\n");
-    printf("*** DIGITE 06 - CRIAR BACKUP EM ARQUIVOS .TXT E .CSV ********\n");
+    printf("*** DIGITE 06 - CRIAR BACKUP EM ARQUIVOS .BKP E .CSV ********\n");
     printf("*** DIGITE 07 - PARA SAIR ***********************************\n");
     printf("\n-------------------------------------------------------------\n");
 }
