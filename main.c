@@ -107,59 +107,59 @@ void inicializaCadastro()
 
     fclose(arquivoCadastro);
 
-    /* Inicializando o Cabeçalho da tabela Cadastro do Arquivo bdCadastroCsv.txt */
-    FILE* arquivoCadastro_CSV;
-    arquivoCadastro_CSV = fopen("bd/bdCadastro_CSV.txt", "r+");
+    /* Inicializando o Cabeçalho da tabela Cadastro do Arquivo bdCadastro.bkp */
+    FILE* arquivoCadastro_bkp;
+    arquivoCadastro_bkp = fopen("bd/bdCadastro.bkp", "r+");
 
     /* Variável Tabela de Cadastro Head*/
     SmaquinaHead TcadastroCsv[1];
 
     /* Tratamento de Erro caso o Arquivo não seja: Criado, Encontrado, ou Acesso Permitido*/
-    if (arquivoCadastro_CSV == NULL)
+    if (arquivoCadastro_bkp == NULL)
     {
         head();
 
-        printf("\n******** Arquivo bdCadastro_CSV.txt Não Encontrado! *********\n\n");
+        printf("\n********** Arquivo bdCadastro.bkp Não Encontrado! ***********\n\n");
         printf("\n-------------------------------------------------------------\n");
-        printf("\n************ Arquivo bdCadastro_CSV.txt Criado **************\n\n");
+        printf("\n************** Arquivo bdCadastro.bkp Criado ****************\n\n");
         printf("\n---------------------[DIGITE ENTER]--------------------------\n");
 
 
-        arquivoCadastro_CSV = fopen("bd/bdCadastro_CSV.txt", "w");
+        arquivoCadastro_bkp = fopen("bd/bdCadastro.bkp", "w");
 
-        fclose(arquivoCadastro_CSV);
+        fclose(arquivoCadastro_bkp);
         getch();
 
     }
     else
     {
-        arquivoCadastro_CSV = fopen("bd/bdCadastro_CSV.txt", "r+");
+        arquivoCadastro_bkp = fopen("bd/bdCadastro.bkp", "r+");
         /* Retornando Registro para o Indice 0 */
-        rewind(arquivoCadastro_CSV);
+        rewind(arquivoCadastro_bkp);
 
         /* Inicializando cadastro e Registrando no início do Arquivo como Cabeçalho */
         strcpy(TcadastroCsv[0].maquinaId, "Id");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaId);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaId);
 
         strcpy(TcadastroCsv[0].maquinaNome, "Nome da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaNome);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaNome);
 
         strcpy(TcadastroCsv[0].maquinaIp, "IP da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaIp);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaIp);
 
         strcpy(TcadastroCsv[0].maquinaSo, "SO da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaSo);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaSo);
 
         strcpy(TcadastroCsv[0].maquinaVersao, "Versão do SO");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaVersao);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaVersao);
 
         strcpy(TcadastroCsv[0].maquinaUsuario, "Usuário da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaUsuario);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaUsuario);
 
         strcpy(TcadastroCsv[0].maquinaSetor, "Setor/Departamento");
-        fprintf(arquivoCadastro_CSV, "%s;\n", TcadastroCsv[0].maquinaSetor);
+        fprintf(arquivoCadastro_bkp, "%s;\n", TcadastroCsv[0].maquinaSetor);
     }
-    fclose(arquivoCadastro_CSV);
+    fclose(arquivoCadastro_bkp);
 
 
     /* Inicializando o Cabeçalho da tabela Cadastro do Arquivo bdCadastro.csv */
@@ -876,10 +876,10 @@ void realizarBackupCadastro()
     arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
 
 
-    /* Criando o Backup do BD por meio de um Arquivo de Txt no Formato CSV(separado por ;) */
+    /* Criando o Backup do BD por meio de um Arquivo no Formato Bkp */
 
-    FILE* arquivoCadastro_CSV;
-    arquivoCadastro_CSV = fopen("bd/bdCadastro_Csv.txt", "w");
+    FILE* arquivoCadastro_bkp;
+    arquivoCadastro_bkp = fopen("bd/bdCadastro.bkp", "w");
 
     /* Criando o Backup BD por meio de um Arquivo Csv  */
 
@@ -894,7 +894,7 @@ void realizarBackupCadastro()
         printf("\n***************** Arquivo Não Encontrado! *******************\n");
         exit(1);
     }
-    else if (arquivoCadastro_CSV == NULL)
+    else if (arquivoCadastro_bkp == NULL)
     {
         printf("\n*************** Arquivo csv não Encontrado! *****************\n");
         exit(1);
@@ -907,29 +907,29 @@ void realizarBackupCadastro()
     else
     {
         /* Retornando Registro para o Indice 0 */
-        rewind(arquivoCadastro_CSV);
+        rewind(arquivoCadastro_bkp);
 
         /* Inicializando Cadastro e Registrando no Início do Arquivo como Cabeçalho */
         strcpy(TcadastroCsv[0].maquinaId, "Id");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaId);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaId);
 
         strcpy(TcadastroCsv[0].maquinaNome, "Nome da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaNome);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaNome);
 
         strcpy(TcadastroCsv[0].maquinaIp, "IP da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaIp);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaIp);
 
         strcpy(TcadastroCsv[0].maquinaSo, "SO da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaSo);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaSo);
 
         strcpy(TcadastroCsv[0].maquinaVersao, "Versão do SO");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaVersao);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaVersao);
 
         strcpy(TcadastroCsv[0].maquinaUsuario, "Usuário da Máquina");
-        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaUsuario);
+        fprintf(arquivoCadastro_bkp, "%s;", TcadastroCsv[0].maquinaUsuario);
 
         strcpy(TcadastroCsv[0].maquinaSetor, "Setor/Departamento");
-        fprintf(arquivoCadastro_CSV, "%s;\n", TcadastroCsv[0].maquinaSetor);
+        fprintf(arquivoCadastro_bkp, "%s;\n", TcadastroCsv[0].maquinaSetor);
 
 
         /* Inicializando cadastro e Registrando no início do Arquivo como Cabeçalho */
@@ -956,42 +956,42 @@ void realizarBackupCadastro()
         fprintf(arquivoCadastroCsv, "%s;\n", TcadastroCsv[0].maquinaSetor);
 
 
-        /* Copiando Registros do Arquivi .dat para os Arquivos .Txt e .Csv */
+        /* Copiando Registros do Arquivo .dat para os Arquivos .bkp e .Csv */
 
         while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
         {
 
             /*printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);*/
-            fprintf(arquivoCadastro_CSV, "%d;", Tcadastro.maquinaId);
+            fprintf(arquivoCadastro_bkp, "%d;", Tcadastro.maquinaId);
             fprintf(arquivoCadastroCsv, "%d;", Tcadastro.maquinaId);
 
             /*printf("\nNome da Máquina: %s \n", Tcadastro.maquinaNome);*/
-            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaNome));
+            fprintf(arquivoCadastro_bkp, "%s;", strupr(Tcadastro.maquinaNome));
             fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaNome));
 
 
             /*printf("\nIP da Máquina: %s \n", Tcadastro.maquinaIp);*/
-            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaIp));
+            fprintf(arquivoCadastro_bkp, "%s;", strupr(Tcadastro.maquinaIp));
             fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaIp));
 
 
             /*printf("\nSO da Máquina: %s \n", Tcadastro.maquinaSo);*/
-            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaSo));
+            fprintf(arquivoCadastro_bkp, "%s;", strupr(Tcadastro.maquinaSo));
             fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaSo));
 
 
             /*printf("\nVersão do SO: %s \n", Tcadastro.maquinaVersao);*/
-            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaVersao));
+            fprintf(arquivoCadastro_bkp, "%s;", strupr(Tcadastro.maquinaVersao));
             fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaVersao));
 
 
             /*printf("\nUsuário Responsável: %s \n", Tcadastro.maquinaUsuario);*/
-            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaUsuario));
+            fprintf(arquivoCadastro_bkp, "%s;", strupr(Tcadastro.maquinaUsuario));
             fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaUsuario));
 
 
             /*printf("\nSetor/Departamento da Máquina: %s \n", Tcadastro.maquinaSetor);*/
-            fprintf(arquivoCadastro_CSV, "%s;\n", strupr(Tcadastro.maquinaSetor));
+            fprintf(arquivoCadastro_bkp, "%s;\n", strupr(Tcadastro.maquinaSetor));
             fprintf(arquivoCadastroCsv, "%s;\n", strupr(Tcadastro.maquinaSetor));
 
 
@@ -1001,7 +1001,7 @@ void realizarBackupCadastro()
 
 
     fclose(arquivoCadastro);
-    fclose(arquivoCadastro_CSV);
+    fclose(arquivoCadastro_bkp);
     fclose(arquivoCadastroCsv);
 
     printf("\n-------------------------------------------------------------\n");
@@ -1154,7 +1154,7 @@ int main(void)
     /* Titulo da Aplicação */
     system("title ACM - Aplicação de Cadastro de Máquinas");
 
-    /* Inicializa os Banco de Dados - bdId | bdCadastro | bdCadastr_CSV*/
+    /* Inicializa os Banco de Dados - bdId | bdCadastro | bdCadastr_bkp*/
     inicializaCadastro();
 
     /* Váriaveis Locais */
