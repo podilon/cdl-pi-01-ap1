@@ -2,326 +2,1246 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
+#include <ctype.h>
 
-//CONSTANTES
 
-/* Valor definindo quantidade de registros */
-#define MAXCADASTRO 10
-
-//VARIAVEIS GLOBAL
+/*VARIAVEIS GLOBAL*/
 
 /* Inicializando ID */
-int vg_ID = 0;
+int vg_ID;
 
-//STRUCT CADASTRO M√ÅQUINA
+/*STRUCT¥S*/
+
+/* Struct Cadastro M·quina Head*/
 
 typedef struct
 {
-    char nomeMaquina[25];
-    char ipMaquina[15];
-    char soMaquina[15];
-    char versaoSoMaquina[15];
-    char usuarioMaquina[15];
-    char setorMaquina[15];
+    char maquinaId[25];
+    char maquinaNome[25];
+    char maquinaIp[25];
+    char maquinaSo[25];
+    char maquinaVersao[25];
+    char maquinaUsuario[25];
+    char maquinaSetor[25];
 
-} Tmaquina;
+} SmaquinaHead;
 
-/* Tabela Cadastro - Tipo | Tabela[MAXCADASTRO] */
-Tmaquina cadastro[MAXCADASTRO];
+/* Struct Cadastro M·quina */
 
-// PROCEDIMENTO INICIALIZA
+typedef struct
+{
+    int maquinaId;
+    char maquinaNome[25];
+    char maquinaIp[25];
+    char maquinaSo[25];
+    char maquinaVersao[25];
+    char maquinaUsuario[25];
+    char maquinaSetor[25];
 
-/* Inicializa com valores a Tabela Cadastro - registro: Tabela[0] */
+} Smaquina;
+
+/*PROCEDIMENTO INICIALIZAR*/
+
 void inicializaCadastro()
 {
 
-    strcpy(cadastro[0].nomeMaquina, "NULL");
-    strcpy(cadastro[0].ipMaquina, "NULL");
-    strcpy(cadastro[0].soMaquina, "NULL");
-    strcpy(cadastro[0].versaoSoMaquina, "NULL");
-    strcpy(cadastro[0].usuarioMaquina, "NULL");
-    strcpy(cadastro[0].setorMaquina, "NULL");
-    return;
+    /* Inicializa a vari·vel Global vg_ID com os dados Armazenados no BD */
+    FILE* arquivoID;
+
+    arquivoID = fopen("bd/bdId.dat", "rb");
+
+    /* Vari·vel do Leitor do ID */
+    char leitorId[6];
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoID == NULL)
+    {
+        /* FunÁ„o Head*/
+        head();
+        system ("mkdir bd");
+
+        printf("\n\n************* Arquivo bdId.dat N„o Encontrado! **************\n\n");
+        printf("\n-------------------------------------------------------------\n");
+        printf("\n\n*************** Arquivo bdId.dat Criado Ok! *****************\n\n");
+        printf("\n---------------------[DIGITE ENTER]--------------------------\n");
+        arquivoID = fopen("bd/bdId.dat", "wb");
+        /*leitorId[6] = "0";*/
+        /*vg_ID = atoi(leitorId);*/
+        /*fprintf(arquivoID, "%d", vg_ID);*/
+        vg_ID = 0;
+        fprintf( arquivoID,"%d", vg_ID);
+
+        fclose(arquivoID);
+        getch();
+    }
+    else
+    {
+
+        freopen("bd/bdId.dat", "rb", arquivoID);
+        fgets(leitorId, 6, arquivoID);
+        vg_ID = atoi(leitorId);
+    }
+
+    fclose(arquivoID);
+
+    /* Consultando se o BD est· DisponÌvel em Arquivo dat */
+    FILE* arquivoCadastro;
+    arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro == NULL)
+    {
+        head();
+
+        printf("\n\n********** Arquivo bdCadastro.dat N„o Encontrado! ***********\n\n");
+        printf("\n-------------------------------------------------------------\n");
+        printf("\n\n************ Arquivo bdCadastro.dat Criado Ok! **************\n\n");
+        printf("\n---------------------[DIGITE ENTER]--------------------------\n");
+
+        /* Criando o BD por meio de um Arquivo de dat */
+        arquivoCadastro = fopen("bd/bdCadastro.dat", "wb");
+        fclose(arquivoCadastro);
+        getch();
+    }
+
+    fclose(arquivoCadastro);
+
+    /* Inicializando o CabeÁalho da tabela Cadastro do Arquivo bdCadastroCsv.txt */
+    FILE* arquivoCadastro_CSV;
+    arquivoCadastro_CSV = fopen("bd/bdCadastro_CSV.txt", "r+");
+
+    /* Vari·vel Tabela de Cadastro Head*/
+    SmaquinaHead TcadastroCsv[1];
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro_CSV == NULL)
+    {
+        head();
+
+        printf("\n******** Arquivo bdCadastro_CSV.txt N„o Encontrado! *********\n\n");
+        printf("\n-------------------------------------------------------------\n");
+        printf("\n************ Arquivo bdCadastro_CSV.txt Criado **************\n\n");
+        printf("\n---------------------[DIGITE ENTER]--------------------------\n");
+
+
+        arquivoCadastro_CSV = fopen("bd/bdCadastro_CSV.txt", "w");
+
+        fclose(arquivoCadastro_CSV);
+        getch();
+
+    }
+    else
+    {
+        arquivoCadastro_CSV = fopen("bd/bdCadastro_CSV.txt", "r+");
+        /* Retornando Registro para o Indice 0 */
+        rewind(arquivoCadastro_CSV);
+
+        /* Inicializando cadastro e Registrando no inÌcio do Arquivo como CabeÁalho */
+        strcpy(TcadastroCsv[0].maquinaId, "Id");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaId);
+
+        strcpy(TcadastroCsv[0].maquinaNome, "Nome da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaNome);
+
+        strcpy(TcadastroCsv[0].maquinaIp, "IP da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaIp);
+
+        strcpy(TcadastroCsv[0].maquinaSo, "SO da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaSo);
+
+        strcpy(TcadastroCsv[0].maquinaVersao, "Vers„o do SO");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaVersao);
+
+        strcpy(TcadastroCsv[0].maquinaUsuario, "Usu·rio da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaUsuario);
+
+        strcpy(TcadastroCsv[0].maquinaSetor, "Setor/Departamento");
+        fprintf(arquivoCadastro_CSV, "%s;\n", TcadastroCsv[0].maquinaSetor);
+    }
+    fclose(arquivoCadastro_CSV);
+
+
+    /* Inicializando o CabeÁalho da tabela Cadastro do Arquivo bdCadastro.csv */
+    FILE* arquivoCadastroCsv;
+    arquivoCadastroCsv = fopen("bd/bdCadastro.csv", "r+");
+
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastroCsv == NULL)
+    {
+        head();
+
+        printf("\n******** Arquivo bdCadastro.csv N„o Encontrado! *********\n\n");
+        printf("\n-------------------------------------------------------------\n");
+        printf("\n************ Arquivo bdCadastro.csv Criado **************\n\n");
+        printf("\n-------------------------------------------------------------\n");
+
+        head();
+
+        printf("\n************** Favor Reinicie a AplicaÁ„o! ******************\n\n");
+        printf("\n-------------------------------------------------------------\n");
+        printf("\n---------------------[DIGITE ENTER]--------------------------\n");
+
+        arquivoCadastroCsv = fopen("bd/bdCadastro.csv", "w");
+
+        fclose(arquivoCadastroCsv);
+        getch();
+        exit(1);
+    }
+    else
+    {
+        arquivoCadastroCsv = fopen("bd/bdCadastro.csv", "r+");
+        /* Retornando Registro para o Indice 0 */
+        rewind(arquivoCadastroCsv);
+
+        /* Inicializando cadastro e Registrando no inÌcio do Arquivo como CabeÁalho */
+
+        strcpy(TcadastroCsv[0].maquinaId, "Id");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaId);
+
+
+        strcpy(TcadastroCsv[0].maquinaNome, "Nome da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaNome);
+
+        strcpy(TcadastroCsv[0].maquinaIp, "IP da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaIp);
+
+        strcpy(TcadastroCsv[0].maquinaSo, "SO da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaSo);
+
+        strcpy(TcadastroCsv[0].maquinaVersao, "Vers„o do SO");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaVersao);
+
+        strcpy(TcadastroCsv[0].maquinaUsuario, "Usu·rio da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaUsuario);
+
+        strcpy(TcadastroCsv[0].maquinaSetor, "Setor/Departamento");
+        fprintf(arquivoCadastroCsv, "%s;\n", TcadastroCsv[0].maquinaSetor);
+    }
+    fclose(arquivoCadastroCsv);
 }
 
-// 00 - PROCEDIMENTO MENU //
+/*PROCEDIMENTO ATUALIZAR ID*/
 
-void menu(void)
+/* Atualiza a vari·vel Global vg_ID e Armazena no BD */
+
+void atualizarId()
+{
+    FILE* arquivoID;
+    arquivoID = fopen("bd/bdId.dat", "wb");
+
+    /* Tratamento de Erro caso o Arquivo n√£o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoID == NULL)
+    {
+        printf("\n***************** Arquivo n„o Encontrado! *******************\n");
+        exit(1);
+    }
+    else
+    {
+        fprintf(arquivoID, "%d", vg_ID);
+    }
+
+    fclose(arquivoID);
+}
+
+
+
+/*PROCEDIMENTO HEAD*/
+void head()
+{
+    system("cls");
+    printf("\n-------------------------------------------------------------\n");
+    printf("\n------------- Sistema de Cadastro de Equipamentos -----------\n");
+    printf("\n-------------------------------------------------------------\n");
+}
+
+/*PROCEDIMENTO SUBMENU INTERNO FILTRAR CONSULTA DE CADASTRO*/
+
+void submenuFiltroConsulta()
 {
 
+    printf("\n--------------- OpÁıes de Filtro de Pesquisa ----------------\n");
+    printf("\n*** DIGITE 01 - CONSULTA POR ID *****************************\n");
+    printf("*** DIGITE 02 - CONSULTA POR NOME ***************************\n");
+    printf("*** DIGITE 03 - CONSULTA POR IP *****************************\n");
+    printf("*** DIGITE 04 - CONSULTA POR SO *****************************\n");
+    printf("*** DIGITE 05 - CONSULTA POR VERS√O DO SO *******************\n");
+    printf("*** DIGITE 06 - CONSULTA POR USU¡RIO ************************\n");
+    printf("*** DIGITE 07 - CONSULTA POR SETOR/DEPARTAMENTO *************\n");
+    printf("*** DIGITE 08 - RETORNAR AO MENU ****************************\n");
     printf("\n-------------------------------------------------------------\n");
-    printf("\n----- Bem Vindos ao Sistema de Cadastro de Equipamentos -----\n");
+}
+
+/*00 - PROCEDIMENTO MENU*/
+
+void menu()
+{
+    /* Procedimento Head*/
+    head();
+
     printf("\n---------------------- Menu do Sistema ----------------------\n");
-    printf("\n*** DIGITE 01 - CADASTRAR COMPUTADOR ************************\n");
-    printf("*** DIGITE 02 - CONSULTAR COMPUTADORES POR ID ***************\n");
+    printf("\n*** DIGITE 01 - CADASTRAR M¡QUINA ***************************\n");
+    printf("*** DIGITE 02 - FILTRAR CONSULTAS DAS M¡QUINAS **************\n");
     printf("*** DIGITE 03 - VISUALIZAR LISTA DE COMPUTADORES ************\n");
     printf("*** DIGITE 04 - ALTERAR CADASTRO DE COMPUTADOR **************\n");
-    printf("*** DIGITE 05 - PARA SAIR ***********************************\n");
+    printf("*** DIGITE 05 - EXCLUIR CADASTRO DE COMPUTADOR **************\n");
+    printf("*** DIGITE 06 - CRIAR BACKUP EM ARQUIVOS .TXT E .CSV ********\n");
+    printf("*** DIGITE 07 - PARA SAIR ***********************************\n");
     printf("\n-------------------------------------------------------------\n");
-
-    return;
 }
 
-//fun√ßao que limpa o buffer
-void flush_in()
+/*01 - PROCEDIMENTO CADASTRAR M¡QUINA*/
+
+void cadastrar()
 {
-    int ch;
-    while ((ch = fgetc(stdin)) != EOF && ch != '\n')
+    char leitorip[25];
+    /* Vari·vel Tabela de cadastro */
+    Smaquina Tcadastro;
+
+    /* Criando o BD por meio de um Arquivo  dat */
+    FILE* arquivoCadastro;
+    arquivoCadastro = fopen("bd/bdCadastro.dat", "ab");
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro == NULL)
     {
-    }
-}
-
-// 01 - PROCEDIMENTO CADASTRAR M√ÅQUINA//
-
-void cadastrar(void)
-{
-    /* Declara a vari√°vel local vl_id  */
-    int vl_id;
-
-    /* Inicializa a vari√°vel local vl_id com a vari√°vel Global vg_ID  */
-    vl_id = vg_ID;
-
-    /* Exibe o ID do Novo Cadastro a ser Inserido no Registro da Tabela Cadastro */
-    printf("\n-------------------------------------------------------------\n");
-
-    printf("\nCADASTRO ID: %d", vg_ID);
-
-    printf("\n-------------------------------------------------------------\n");
-
-    /* Inclus√£o de Dados do Novo Cadastro a ser Inserido no Registro da Tabela Cadastro */
-    printf("\nDigite o Nome da M√°quina:  ");
-    scanf(" %[^\n]s%*c", &cadastro[vg_ID].nomeMaquina);
-
-    printf("\nDigite o IP da M√°quina: ");
-    scanf(" %[^\n]s%*c", &cadastro[vg_ID].ipMaquina);
-
-    printf("\nDigite o SO da M√°quina: ");
-    scanf(" %[^\n]s%*c", &cadastro[vg_ID].soMaquina);
-
-    printf("\nDigite o vers√£o do SO: ");
-    scanf(" %[^\n]s%*c", &cadastro[vg_ID].versaoSoMaquina);
-
-    printf("\nDigite o usu√°rio respons√°vel: ");
-    scanf(" %[^\n]s%*c", &cadastro[vg_ID].usuarioMaquina);
-
-    printf("\nDigite o setor/departamento da M√°quina:  ");
-    scanf(" %[^\n]s%*c", &cadastro[vg_ID].setorMaquina);
-
-    
-
-    /* Atualizando a v√°riavel Global disponibilizando um novo ID para um pr√≥ximo cadastro */
-    vg_ID++;
-}
-
-// 02 - PROCEDIMENTO CONSULTAR M√ÅQUINAS POR ID
-
-void listarCadastroID(void)
-{
-    /* Declara a vari√°vel local vl_id  */
-    int vl_id = 0;
-
-    /* Inser√ß√£o do ID do Cadastro a ser Consultado */
-    printf("\n-------------------------------------------------------------\n");
-    printf("\nDigite o ID da M√°quina:  ");
-    scanf("%d", &vl_id);
-
-    /* Tratamento de Erro para o ID do Cadastro Inv√°lido */
-    if ((vl_id < 0) || (vl_id >= vg_ID))
-    {
-        printf("\n-------------------------------------------------------------\n");
-        printf("\n*********************** ID INV√ÅLIDO *************************\n");
-        
+        printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+        exit(1);
     }
     else
     {
-        /* Visualizar Cadastro de Acordo com ID selecionado */
-        printf("\n-------------------------------------------------------------\n");
-        printf("\n ID da M√°quina: %d \n", vl_id);
-        printf("\n-------------------------------------------------------------\n");
+        do
+        {
+            /* Head */
+            head();
 
-        printf("\nNome da M√°quina: %s \n", cadastro[vl_id].nomeMaquina);
-        printf("\nSO da M√°quina: %s \n", cadastro[vl_id].soMaquina);
-        printf("\nIP da M√°quina: %s \n", cadastro[vl_id].ipMaquina);
-        printf("\nVers√£o do SO: %s \n", cadastro[vl_id].versaoSoMaquina);
-        printf("\nUsu√°rio respons√°vel: %s \n", cadastro[vl_id].usuarioMaquina);
-        printf("\nSetor/Departamento da M√°quina: %s \n", cadastro[vl_id].setorMaquina);
-        
+            /* Sub Head*/
+            printf("\n*************** OpÁ„o 1 - Cadastrar M·quina *****************\n");
+            printf("\n-------------------------------------------------------------\n");
+
+            /* Atualizando a Vari·vel Global Disponibilizando um Novo ID para um PrÛximo Cadastro */
+            vg_ID++;
+
+            /* Exibe o ID do Novo Cadastro a ser Inserido no Registro da Tabela Cadastro */
+
+            printf("\n-------------------------------------------------------------\n");
+
+            /* Atribui autom·ticamente o ID */
+            Tcadastro.maquinaId = vg_ID;
+
+            printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+
+            printf("\n-------------------------------------------------------------\n");
+
+            setbuf(stdin, NULL);
+            printf("\nDigite o Nome da M·quina:  ");
+            strupr(gets(Tcadastro.maquinaNome));
+
+            setbuf(stdin, NULL);
+            printf("\nDigite o IP da M·quina: ");
+            strupr(gets(Tcadastro.maquinaIp));
+
+            setbuf(stdin, NULL);
+            printf("\nDigite o SO da M·quina: ");
+            strupr(gets(Tcadastro.maquinaSo));
+
+            setbuf(stdin, NULL);
+            printf("\nDigite o Vers„o do SO:  ");
+            strupr(gets(Tcadastro.maquinaVersao));
+
+            setbuf(stdin, NULL);
+            printf("\nDigite o Usu·rio Respons·vel: ");
+            strupr(gets(Tcadastro.maquinaUsuario));
+
+            setbuf(stdin, NULL);
+            printf("\nDigite o Setor/Departamento: ");
+            strupr(gets(Tcadastro.maquinaSetor));
+
+            fwrite(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro);
+
+            printf("\n-------------------------------------------------------------\n");
+            printf("\nDeseja cadastrar uma nova m·quina? (s/n) ");
+
+        }
+        while (tolower(getche()) == 's');
+
+        fclose(arquivoCadastro);
     }
-
-    return;
 }
 
-// 03 - PROCEDIMENTO LISTAR CADASTRO DE M√ÅQUINAS
+/*02 - PROCEDIMENTO CONSULTAR M¡QUINAS POR FILTRO*/
 
-void listarCadastro(void)
+void listarCadastroFiltro()
 {
-    int vl_id;
 
-    for (vl_id = 0; vl_id < vg_ID; vl_id++)
+    /* Criando o BD por meio de um Arquivo .Dat */
+    FILE* arquivoCadastro;
+
+    /* Vari·vel Tabela de Cadastro */
+    Smaquina Tcadastro;
+
+    /* Vari·vel de Pesquisa */
+    char vl_entrada[30];
+    char vl_opcaoChar[10];
+    int vl_entrada_id=0;
+    int vl_opcao = 0;
+
+    while (vl_opcao != 8)
     {
-        printf("\n-------------------------------------------------------------\n");
-        printf("\n ID da M√°quina: %d \n", vl_id);
-        printf("\n-------------------------------------------------------------\n");
-        printf("\nNome da M√°quina: %s \n", cadastro[vl_id].nomeMaquina);
-        printf("\nSO da M√°quina: %s \n", cadastro[vl_id].soMaquina);
-        printf("\nIP da M√°quina: %s \n", cadastro[vl_id].ipMaquina);
-        printf("\nVers√£o do SO: %s \n", cadastro[vl_id].versaoSoMaquina);
-        printf("\nUsu√°rio respons√°vel: %s \n", cadastro[vl_id].usuarioMaquina);
-        printf("\nSetor/Departamento da M√°quina: %s \n", cadastro[vl_id].setorMaquina);
-        
+        arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
+
+        /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+        if (arquivoCadastro == NULL)
+        {
+            printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+            exit(1);
+        }
+        else
+        {
+            /* Head */
+            head();
+
+            /* Sub Head*/
+            printf("\n*************** OpÁ„o 2 - Pesquisar Cadastro ****************\n");
+            printf("\n-------------------------------------------------------------\n");
+
+            /* Lista de Submenu Filtro de Pesquisa */
+            submenuFiltroConsulta();
+
+            /* Recebendo os Dados do Usu·rio Referente a OpÁ„o do Menu*/
+            printf("\nDigite a OpÁ„o: ");
+            fgets(vl_opcaoChar, 2, stdin);
+            printf("\n-------------------------------------------------------------\n");
+
+            /* Convertendo a String em Inteiro*/
+            vl_opcao = atoi(vl_opcaoChar);
+
+            /* Limpando o Buffer do Teclado */
+            setbuf(stdin, NULL);
+
+            switch (vl_opcao)
+            {
+            /* Consulta por ID */
+            case 1:
+
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n**************** OpÁ„o 1 - Pesquisar por ID *****************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente ao ID desejado */
+                printf("\nDigite o ID: ");
+                scanf(" %d", &vl_entrada_id);
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (vl_entrada_id == Tcadastro.maquinaId)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            /* Consulta por Nome da M·quina */
+            case 2:
+
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n*************** OpÁ„o 2 - Pesquisar por Nome ****************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente ao Nome da m·quina */
+                printf("\nDigite o Nome da m·quina: ");
+                strupr(gets(vl_entrada));
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (strcmp(strupr(vl_entrada), Tcadastro.maquinaNome) == 0)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            /* Consulta por IP da M·quina */
+            case 3:
+
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n**************** OpÁ„o 3 - Pesquisar por IP *****************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente ao IP da m·quina */
+                printf("\nDigite o IP da m·quina: ");
+                strupr(gets(vl_entrada));
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (strcmp(strupr(vl_entrada), Tcadastro.maquinaIp) == 0)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            /* Consulta por SO da M·quina */
+            case 4:
+
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n**************** OpÁ„o 4 - Pesquisar por SO *****************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente ao SO da m·quina */
+                printf("\nDigite o SO da m·quina: ");
+                gets(vl_entrada);
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (strcmp(strupr(vl_entrada), Tcadastro.maquinaSo) == 0)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            /* Consulta por Vers„o do SO da M·quina */
+            case 5:
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n*********** OpÁ„o 5 - Pesquisar por Vers„o do SO ************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente a Vers„o do SO da m·quina */
+                printf("\nDigite o Vers„o do SO da m·quina: ");
+                gets(vl_entrada);
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (strcmp(strupr(vl_entrada), Tcadastro.maquinaVersao) == 0)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            /* Consulta por Usu·rio da M·quina */
+            case 6:
+
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n************** OpÁ„o 6 - Pesquisar por Usu·rio **************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente ao Usu·rio da m·quina */
+                printf("\nDigite o Usu·rio da m·quina: ");
+                gets(vl_entrada);
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (strcmp(strupr(vl_entrada), Tcadastro.maquinaUsuario) == 0)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            /* Consulta por Setor/Departamento da M·quina */
+            case 7:
+
+                /* Head */
+                head();
+
+                /* Sub Head*/
+                printf("\n*************** OpÁ„o 7 - Pesquisar por Setor ***************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+
+                /* Recebendo os Dados do Usu·rio Referente ao Setor/Departamento da m·quina */
+                printf("\nDigite o Setor/Departamento da m·quina: ");
+                gets(vl_entrada);
+                printf("\n-------------------------------------------------------------\n");
+
+                /* Listando os Dados */
+                while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+                {
+                    if (strcmp(strupr(vl_entrada), Tcadastro.maquinaSetor) == 0)
+                    {
+                        printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                        printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                        printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                        printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                        printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                        printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                        printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                        printf("\n-------------------------------------------------------------\n");
+                        getch();
+                    }
+                }
+
+                /* Limpando o Buffer do Teclado */
+                setbuf(stdin, NULL);
+                break;
+
+            case 8:
+                break;
+
+            default:
+
+                printf("\n-------------------------------------------------------------\n");
+                printf("\n********************* OpÁ„o Inv·lida ************************\n");
+                printf("\n-------------------------------------------------------------\n");
+                getch();
+                setbuf(stdin, NULL);
+                break;
+            }
+        }
     }
+    fclose(arquivoCadastro);
 }
 
-// 04 - PROCEDIMENTO ALTERAR CADASTRO DE M√ÅQUINA
+/*03 - PROCEDIMENTO LISTAR CADASTRO*/
 
-void alterarCadastro(void)
+void listarCadastro()
 {
-    /* Declara e Inicializa a vari√°vel local vl_id  */
-    int vl_id = 0;
+    /* Head */
+    head();
 
-    /* Inser√ß√£o do ID do cadastro a ser alterado */
+    /* Sub Head*/
+    printf("\n*************** OpÁ„o 3 - Listar Cadastro *******************\n");
     printf("\n-------------------------------------------------------------\n");
-    printf("\nDigite o ID da M√°quina:  ");
-    scanf("%d", &vl_id);
 
-    /* Tratamento de Erro para o ID do Cadastro Inv√°lido */
-    if ((vl_id < 0) || (vl_id >= vg_ID))
+    /* Vari·vel Tabela de cadastro */
+    Smaquina Tcadastro;
+
+    /* Criando o BD por meio de um Arquivo de dat */
+    FILE* arquivoCadastro;
+    arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro == NULL)
     {
-        printf("\n-------------------------------------------------------------\n");
-        printf("\n*********************** ID INV√ÅLIDO *************************\n");
-        
+        printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+        exit(1);
     }
     else
     {
-        /* Visualizar Cadastro de Acordo com ID selecionado */
+        while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+        {
+
+            printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+            printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+            printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+            printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+            printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+            printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+            printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+            printf("\n-------------------------------------------------------------\n");
+        }
+    }
+
+    fclose(arquivoCadastro);
+}
+
+/*04 - PROCEDIMENTO ALTERAR CADASTRO */
+void alterarCadastro()
+{
+    /* Head */
+    head();
+
+    /* Sub Head*/
+    printf("\n*************** OpÁ„o 4 - Alterar Cadastro ******************\n");
+    printf("\n-------------------------------------------------------------\n");
+
+
+    /* Vari·vel Tabela de Cadastro */
+    Smaquina Tcadastro;
+
+    /* Vari·vel de Pesquisa */
+    int vl_entrada_id;
+
+    /* Criando o BD por meio de um Arquivo de dat */
+    FILE* arquivoCadastro;
+    arquivoCadastro = fopen("bd/bdCadastro.dat", "r+b");
+
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro == NULL)
+    {
+        printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+        exit(1);
+    }
+    /* Consulta por ID */
+    else
+    {
+        /* Limpando o Buffer do Teclado */
+        setbuf(stdin, NULL);
+
+        /* Recebendo os Dados do Usu·rio Referente ao ID desejado */
+        printf("\nDigite o ID: ");
+        scanf(" %d", &vl_entrada_id);
         printf("\n-------------------------------------------------------------\n");
-        printf("\n ID da M√°quina: %d \n", vl_id);
-        printf("\n-------------------------------------------------------------\n");
 
-        printf("\nNome da M√°quina: %s \n", cadastro[vl_id].nomeMaquina);
-        printf("\nSO da M√°quina: %s \n", cadastro[vl_id].soMaquina);
-        printf("\nIP da M√°quina: %s \n", cadastro[vl_id].ipMaquina);
-        printf("\nVers√£o do SO: %s \n", cadastro[vl_id].versaoSoMaquina);
-        printf("\nUsu√°rio respons√°vel: %s \n", cadastro[vl_id].usuarioMaquina);
-        printf("\nSetor/Departamento da M√°quina: %s \n", cadastro[vl_id].setorMaquina);
-        
 
-        /* Alterar Cadastro */
+        while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+        {
+            if (vl_entrada_id == Tcadastro.maquinaId)
+            {
+                printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                printf("\n-------------------------------------------------------------\n");
+                getch();
 
-        printf("\n-------------------------------------------------------------\n");
-        printf("\nCADASTRO ID: %d", vl_id);
-        printf("\n-------------------------------------------------------------\n");
 
-        printf("\nDigite o Nome da M√°quina:  ");
-        scanf(" %[^\n]s%*c", &cadastro[vl_id].nomeMaquina);
 
-        printf("\nDigite o IP da M√°quina: ");
-        scanf(" %[^\n]s%*c", &cadastro[vl_id].ipMaquina);
+                Tcadastro.maquinaId = vl_entrada_id;
 
-        printf("\nDigite o SO da M√°quina: ");
-        scanf(" %[^\n]s%*c", &cadastro[vl_id].soMaquina);
+                printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
 
-        printf("\nDigite o vers√£o do SO: ");
-        scanf(" %[^\n]s%*c", &cadastro[vl_id].versaoSoMaquina);
+                setbuf(stdin, NULL);
+                printf("\nDigite o Nome da M·quina:  ");
+                strupr(gets(Tcadastro.maquinaNome));
 
-        printf("\nDigite o usu√°rio respons√°vel: ");
-        scanf(" %[^\n]s%*c", &cadastro[vl_id].usuarioMaquina);
 
-        printf("\nDigite o setor/departamento da M√°quina:  ");
-        scanf(" %[^\n]s%*c", &cadastro[vl_id].setorMaquina);
+                setbuf(stdin, NULL);
+                printf("\nDigite o IP da M·quina: ");
+                strupr(gets(Tcadastro.maquinaIp));
 
-        
+                setbuf(stdin, NULL);
+                printf("\nDigite o SO da M·quina: ");
+                strupr(gets(Tcadastro.maquinaSo));
+
+                setbuf(stdin, NULL);
+                printf("\nDigite o Vers„o do SO:  ");
+                strupr(gets(Tcadastro.maquinaVersao));
+
+                setbuf(stdin, NULL);
+                printf("\nDigite o Usu·rio Respons·vel: ");
+                strupr(gets(Tcadastro.maquinaUsuario));
+
+                setbuf(stdin, NULL);
+                printf("\nDigite o Setor/Departamento: ");
+                strupr(gets(Tcadastro.maquinaSetor));
+
+                fseek (arquivoCadastro, sizeof(Smaquina)*-1, SEEK_CUR);
+                fwrite(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro);
+                fseek (arquivoCadastro, 0, SEEK_CUR);
+                break;
+
+            }
+        }
+    }
+
+    fclose(arquivoCadastro);
+}
+
+
+/*05 - PROCEDIMENTO REALIZAR BACKUP CADASTRO EM ARQUIVOS .TXT E .CSV*/
+
+void realizarBackupCadastro()
+{
+    /* Head */
+    head();
+
+    /* Sub Head*/
+    printf("\n*************** OpÁ„o 5 - Backup Cadastro *******************\n");
+    printf("\n-------------------------------------------------------------\n");
+
+    /* Vari·vel Tabela de Cadastro Head*/
+    SmaquinaHead TcadastroCsv[1];
+
+    /* Vari·vel Tabela de cadastro */
+    Smaquina Tcadastro;
+
+
+    /* Criando o BD por meio de um Arquivo de dat */
+    FILE* arquivoCadastro;
+    arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
+
+
+    /* Criando o Backup do BD por meio de um Arquivo de Txt no Formato CSV(separado por ;) */
+
+    FILE* arquivoCadastro_CSV;
+    arquivoCadastro_CSV = fopen("bd/bdCadastro_Csv.txt", "w");
+
+    /* Criando o Backup BD por meio de um Arquivo Csv  */
+
+    FILE* arquivoCadastroCsv;
+    arquivoCadastroCsv = fopen("bd/bdCadastro.csv", "w");
+
+
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro == NULL)
+    {
+        printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+        exit(1);
+    }
+    else if (arquivoCadastro_CSV == NULL)
+    {
+        printf("\n*************** Arquivo csv n„o Encontrado! *****************\n");
+        exit(1);
+    }
+    else if (arquivoCadastroCsv == NULL)
+    {
+        printf("\n*************** Arquivo csv n„o Encontrado! *****************\n");
+        exit(1);
+    }
+    else
+    {
+        /* Retornando Registro para o Indice 0 */
+        rewind(arquivoCadastro_CSV);
+
+        /* Inicializando Cadastro e Registrando no InÌcio do Arquivo como CabeÁalho */
+        strcpy(TcadastroCsv[0].maquinaId, "Id");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaId);
+
+        strcpy(TcadastroCsv[0].maquinaNome, "Nome da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaNome);
+
+        strcpy(TcadastroCsv[0].maquinaIp, "IP da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaIp);
+
+        strcpy(TcadastroCsv[0].maquinaSo, "SO da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaSo);
+
+        strcpy(TcadastroCsv[0].maquinaVersao, "Vers„o do SO");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaVersao);
+
+        strcpy(TcadastroCsv[0].maquinaUsuario, "Usu·rio da M·quina");
+        fprintf(arquivoCadastro_CSV, "%s;", TcadastroCsv[0].maquinaUsuario);
+
+        strcpy(TcadastroCsv[0].maquinaSetor, "Setor/Departamento");
+        fprintf(arquivoCadastro_CSV, "%s;\n", TcadastroCsv[0].maquinaSetor);
+
+
+        /* Inicializando cadastro e Registrando no inÌcio do Arquivo como CabeÁalho */
+        strcpy(TcadastroCsv[0].maquinaId, "Id");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaId);
+
+
+        strcpy(TcadastroCsv[0].maquinaNome, "Nome da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaNome);
+
+        strcpy(TcadastroCsv[0].maquinaIp, "IP da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaIp);
+
+        strcpy(TcadastroCsv[0].maquinaSo, "SO da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaSo);
+
+        strcpy(TcadastroCsv[0].maquinaVersao, "Vers„o do SO");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaVersao);
+
+        strcpy(TcadastroCsv[0].maquinaUsuario, "Usu·rio da M·quina");
+        fprintf(arquivoCadastroCsv, "%s;", TcadastroCsv[0].maquinaUsuario);
+
+        strcpy(TcadastroCsv[0].maquinaSetor, "Setor/Departamento");
+        fprintf(arquivoCadastroCsv, "%s;\n", TcadastroCsv[0].maquinaSetor);
+
+
+        /* Copiando Registros do Arquivi .dat para os Arquivos .Txt e .Csv */
+
+        while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+        {
+
+            /*printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);*/
+            fprintf(arquivoCadastro_CSV, "%d;", Tcadastro.maquinaId);
+            fprintf(arquivoCadastroCsv, "%d;", Tcadastro.maquinaId);
+
+            /*printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);*/
+            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaNome));
+            fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaNome));
+
+
+            /*printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);*/
+            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaIp));
+            fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaIp));
+
+
+            /*printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);*/
+            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaSo));
+            fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaSo));
+
+
+            /*printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);*/
+            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaVersao));
+            fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaVersao));
+
+
+            /*printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);*/
+            fprintf(arquivoCadastro_CSV, "%s;", strupr(Tcadastro.maquinaUsuario));
+            fprintf(arquivoCadastroCsv, "%s;", strupr(Tcadastro.maquinaUsuario));
+
+
+            /*printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);*/
+            fprintf(arquivoCadastro_CSV, "%s;\n", strupr(Tcadastro.maquinaSetor));
+            fprintf(arquivoCadastroCsv, "%s;\n", strupr(Tcadastro.maquinaSetor));
+
+
+
+        }
     }
 
 
-    return;
+    fclose(arquivoCadastro);
+    fclose(arquivoCadastro_CSV);
+    fclose(arquivoCadastroCsv);
+
+    printf("\n-------------------------------------------------------------\n");
+    printf("\n************** Backup ConcluÌdo com Sucesso *****************\n");
+    printf("\n-------------------------------------------------------------\n");
 }
 
-// FUN√á√ÉO PRINCIPAL //
 
-int main(int argc, char **argv)
+/*06 - PROCEDIMENTO EXCLUIR CADASTRO */
+void excluirCadastro()
 {
+    /* Head */
+    head();
+
+    /* Sub Head*/
+    printf("\n*************** OpÁ„o 6 - Excluir Cadastro ******************\n");
+    printf("\n-------------------------------------------------------------\n");
+
+
+    /* Vari·vel Tabela de Cadastro */
+    Smaquina Tcadastro;
+
+    /* Vari·vel de Pesquisa */
+    int vl_entrada_id;
+
+    /* Criando o BD por meio de um Arquivo de dat */
+    FILE* arquivoCadastro;
+    arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
+
+
+    /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+    if (arquivoCadastro == NULL)
+    {
+        printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+        exit(1);
+    }
+    /* Consulta por ID */
+    else
+    {
+        /* Limpando o Buffer do Teclado */
+        setbuf(stdin, NULL);
+
+        /* Recebendo os Dados do Usu·rio Referente ao ID desejado */
+        printf("\nDigite o ID: ");
+        scanf(" %d", &vl_entrada_id);
+        printf("\n-------------------------------------------------------------\n");
+
+
+        while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+        {
+            if (vl_entrada_id == Tcadastro.maquinaId)
+            {
+                printf("\nCADASTRO ID: %d \n", Tcadastro.maquinaId);
+                printf("\nNome da M·quina: %s \n", Tcadastro.maquinaNome);
+                printf("\nIP da M·quina: %s \n", Tcadastro.maquinaIp);
+                printf("\nSO da M·quina: %s \n", Tcadastro.maquinaSo);
+                printf("\nVers„o do SO: %s \n", Tcadastro.maquinaVersao);
+                printf("\nUsu·rio Respons·vel: %s \n", Tcadastro.maquinaUsuario);
+                printf("\nSetor/Departamento da M·quina: %s \n", Tcadastro.maquinaSetor);
+                printf("\n-------------------------------------------------------------\n");
+                getch();
+            }
+        }
+    }
+    fclose(arquivoCadastro);
+
+
+    /* Limpando o Buffer do Teclado */
+    setbuf(stdin, NULL);
+
+    /* ConfirmaÁ„o de Exclus„o */
+    printf("\n\nTem Certeza que Deseja Excluir o Registro[s/n]?");
+
+
+     /* Exclus„o do Registro por meio de Permuta do Arquivo com os Dados por um Arquivo Tempor·rio */
+    if (tolower(getche()) == 's')
+    {
+        /* Abrindo o BD por meio de um Arquivo de dat */
+
+        arquivoCadastro = fopen("bd/bdCadastro.dat", "rb");
+
+        /* Criando um Arquivo Tempor·rio por meio de um Arquivo de dat */
+        FILE* temp;
+        temp = fopen("bd/temp.dat", "w");
+
+
+        /* Tratamento de Erro caso o Arquivo n„o seja: Criado, Encontrado, ou Acesso Permitido*/
+        if (arquivoCadastro == NULL)
+        {
+            printf("\n***************** Arquivo N„o Encontrado! *******************\n");
+            exit(1);
+        }
+        else
+        {
+            /* GravaÁ„o de Todos os Dados Exceto o que Deseja Excluir no Arquivo Tempor·rio */
+            while (fread(&Tcadastro, sizeof(Smaquina), 1, arquivoCadastro) == 1)
+            {
+                if(vl_entrada_id != Tcadastro.maquinaId)
+                {
+                    fwrite(&Tcadastro, sizeof(Smaquina), 1, temp);
+                }
+            }
+
+            /* Tratamento de Erro do Arquivo Tempor·rio */
+            if (ferror(temp))
+            {
+                printf("\n\n-------------------------------------------------------------\n");
+                printf("\n********************** Erro ao excluir **********************\n");
+                printf("\n-------------------------------------------------------------\n");
+
+            }
+            else
+            {
+                printf("\n\n-------------------------------------------------------------\n");
+                printf("\n******************** ExcluÌdo com Sucesso *******************\n");
+                printf("\n-------------------------------------------------------------\n");
+            }
+
+        }
+
+        /* Fechando os Arquivos */
+        fclose(temp);
+        fclose(arquivoCadastro);
+
+        /* Removendo o Arquivo de Dados */
+        remove("bd/bdCadastro.dat");
+
+        /* Renomeando o Arquivo Tempor·rio pelo Nome do Arquivo Anteriormente ExcluÌdo*/
+        rename("bd/temp.dat", "bd/bdCadastro.dat");
+    }
+
+    /* Limpando o Buffer do Teclado */
+    setbuf(stdin, NULL);
+}
+
+
+
+/*FUN«√O PRINCIPAL*/
+int main(void)
+{
+
+
+
+    /* Alterar a Cor do Console */
+    system("color F1");/* 1 - azul | F -  branco */
+
+    /* Habilitar o idioma para PTBR - UFT8 */
     setlocale(LC_ALL, "Portuguese");
 
-    /* Inicializa√ß√£o da chave: On = 0 | Off = 5 */
-    int vl_start = 0;
+    /* Titulo da AplicaÁ„o */
+    system("title ACM - AplicaÁ„o de Cadastro de M·quinas");
 
-    /* Fun√ß√£o para Inicializar valores a Tabela Cadastro - registro: Tabela[0] */
+    /* Inicializa os Banco de Dados - bdId | bdCadastro | bdCadastr_CSV*/
     inicializaCadastro();
 
-    /* La√ßo While para aplicar o Menu e suas Respectivas Opera√ß√µes: */
-    while (vl_start == 0)
+    /* V·riaveis Locais */
+    char vl_opcaoChar[2];
+    int vl_opcao = 0;
+
+    /* Seletor de opÁıes*/
+
+    while (vl_opcao != 7)
     {
 
-        // 00 - MENU
-
-        /* Fun√ß√£o para Visualizar o Menu na Tela e Inser√ß√£o da Op√ß√£o Desejada */
+        /* Procedimento Menu*/
         menu();
-        printf("\nOp√ß√£o: ");
-        scanf("%d", &vl_start);
-        
 
-        /* Tratamento de Erro na Op√ß√£o Menu */
-        if ((vl_start < 1) || (vl_start > 5))
+        /* Recebendo os Dados do Usu·rio Referente a OpÁ„o do Menu*/
+        printf("\nDigite a OpÁ„o: ");
+        fgets(vl_opcaoChar, 2, stdin);
+
+        /* Convertendo a String em Inteiro*/
+        vl_opcao = atoi(vl_opcaoChar);
+
+        /* Limpando o Buffer do Teclado */
+        setbuf(stdin, NULL);
+
+        switch (vl_opcao)
         {
-            /* Reset da Chave(ON) */
-            vl_start = 0;
-        }
-
-        // 01 - CADASTRAR M√ÅQUINA
-
-        if (vl_start == 1)
-        {
-            /* Fun√ß√£o para Inser√ß√£o de Novo Cadastro */
+        case 1:
+            /* Procedimento Cadastrar */
             cadastrar();
 
-            /* Reset da Chave(ON) */
-            vl_start = 0;
-        }
+            /* Limpando o Buffer do Teclado */
+            setbuf(stdin, NULL);
+            break;
 
-        // 02 - CONSULTA POR ID DA M√ÅQUINA
+        case 2:
+            /* Procedimento Listar Cadastro por ID */
+            listarCadastroFiltro();
+            getch();
+            break;
 
-        if (vl_start == 2)
-        {
-            /* Fun√ß√£o para Listar Cadastro por ID */
-            listarCadastroID();
-
-            /* Reset da Chave(ON) */
-            vl_start = 0;
-        }
-
-        // 03 - LISTAR CADASTRO DAS M√ÅQUINAS
-
-        if (vl_start == 3)
-        {
-            /* Fun√ß√£o para Mostrar Cadastro selecionado por ID a ser Alterado */
+        case 3:
+            /* Procedimento Listar Cadastro */
             listarCadastro();
+            getch();
+            break;
 
-            /* Reset da Chave(ON) */
-            vl_start = 0;
-        }
-
-        // 04 - ALTERAR CADASTRO DAS M√ÅQUINAS
-
-        if (vl_start == 4)
-        {
-            /* Fun√ß√£o para Alterar Cadastro selecionado por ID */
+        case 4:
+            /* Procedimento Alterar Cadastro */
             alterarCadastro();
+            getch();
+            break;
 
-            /* Reset da Chave(ON) */
-            vl_start = 0;
-        }
 
-        // 05 - ENCERRAR
+        case 5:
+            /* Procedimento Excluir Cadastro */
+            excluirCadastro();
+            getch();
+            break;
 
-        /* Fecha a Chave(OFF) */
-        if (vl_start == 5)
-        {
+        case 6:
+            /* Procedimento Realizar Backup do Cadastro */
+            realizarBackupCadastro();
+            getch();
+            break;
+
+        case 7:
+            /* Sair da AplicaÁ„o */
+            printf("\n-------------------------------------------------------------\n");
+            printf("\n********************* Muito Obrigado ************************\n");
+            printf("\n-------------------------------------------------------------\n");
+
+            getch();
+            break;
+
+        default:
+            printf("\n-------------------------------------------------------------\n");
+            printf("\n********************* OpÁ„o Inv·lida ************************\n");
+            printf("\n-------------------------------------------------------------\n");
+            getch();
+            setbuf(stdin, NULL);
+
             break;
         }
     }
 
-    getchar();
+    /* Atualiza os Banco de Dados - bdId */
+    atualizarId();
 
     return 0;
 }
